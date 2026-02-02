@@ -486,7 +486,7 @@
                     document.getElementById('score').textContent = this.score;
 
                     feedback.className = 'feedback correct';
-                    feedback.innerHTML = `<strong>✓ Correct!</strong>The answer is <strong>${correctAnswer}</strong>. Great job!`;
+                    feedback.innerHTML = `<strong>✓ Correct!</strong> The answer is <strong>${correctAnswer}</strong>. Great job!`;
                     
                     setTimeout(() => {
                         this.generateNewMolecule();
@@ -494,9 +494,11 @@
                 } else {
                     feedback.className = 'feedback incorrect';
                     if (userAnswer === '') {
-                        feedback.innerHTML = `<strong>✗ No answer provided</strong>Please enter a name and try again.`;
+                        feedback.innerHTML = `<strong>✗ No answer provided</strong> Please enter a name and try again.`;
                     } else {
-                        feedback.innerHTML = `<strong>✗ Incorrect</strong>Your answer: <strong>${userAnswer}</strong><br>Correct answer: <strong>${correctAnswer}</strong>`;
+                        // Escape user input to prevent XSS
+                        const escapedAnswer = userAnswer.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        feedback.innerHTML = `<strong>✗ Incorrect</strong> Your answer: <strong>${escapedAnswer}</strong><br>Correct answer: <strong>${correctAnswer}</strong>`;
                         
                         setTimeout(() => {
                             this.generateNewMolecule();
