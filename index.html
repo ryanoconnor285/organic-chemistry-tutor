@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organic Chemistry Tutor - IUPAC Naming</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .difficulty-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .difficulty-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .molecule-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #moleculeCanvas {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-section label {
+            display: block;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .input-section input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+            display: block;
+        }
+
+        .feedback strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .hint {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .hint-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .hint-content {
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .difficulty-selector {
+                flex-direction: column;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Organic Chemistry Tutor</h1>
+        <p class="subtitle">IUPAC Naming - Carbon Chains</p>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Correct</div>
+                <div class="stat-value" id="correct">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Total</div>
+                <div class="stat-value" id="total">0</div>
+            </div>
+        </div>
+
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" data-difficulty="easy">Easy (1-4 carbons)</button>
+            <button class="difficulty-btn" data-difficulty="medium">Medium (5-7 carbons)</button>
+            <button class="difficulty-btn" data-difficulty="hard">Hard (8-10 carbons)</button>
+        </div>
+
+        <div class="molecule-container">
+            <canvas id="moleculeCanvas" width="600" height="250"></canvas>
+        </div>
+
+        <div class="input-section">
+            <label for="answer">Enter the IUPAC name:</label>
+            <input type="text" id="answer" placeholder="e.g., propane, hexane, decane" autocomplete="off">
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" id="submitBtn">Submit Answer</button>
+            <button class="btn btn-secondary" id="skipBtn">Skip / New Molecule</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+
+        <div class="hint">
+            <div class="hint-title">📚 IUPAC Naming Rules for Alkanes:</div>
+            <div class="hint-content">
+                <strong>Number of Carbons → Name:</strong><br>
+                1: Methane | 2: Ethane | 3: Propane | 4: Butane | 5: Pentane<br>
+                6: Hexane | 7: Heptane | 8: Octane | 9: Nonane | 10: Decane
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class OrganicChemistryTutor {
+            constructor() {
+                this.canvas = document.getElementById('moleculeCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.difficulty = 'easy';
+                this.currentMolecule = null;
+                this.score = 0;
+                this.correct = 0;
+                this.total = 0;
+
+                // IUPAC naming for alkanes
+                this.alkaneNames = {
+                    1: 'methane',
+                    2: 'ethane',
+                    3: 'propane',
+                    4: 'butane',
+                    5: 'pentane',
+                    6: 'hexane',
+                    7: 'heptane',
+                    8: 'octane',
+                    9: 'nonane',
+                    10: 'decane'
+                };
+
+                this.difficultyRanges = {
+                    easy: { min: 1, max: 4 },
+                    medium: { min: 5, max: 7 },
+                    hard: { min: 8, max: 10 }
+                };
+
+                this.initEventListeners();
+                this.generateNewMolecule();
+            }
+
+            initEventListeners() {
+                // Difficulty selector
+                document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.difficulty = e.target.dataset.difficulty;
+                        this.generateNewMolecule();
+                    });
+                });
+
+                // Submit button
+                document.getElementById('submitBtn').addEventListener('click', () => {
+                    this.checkAnswer();
+                });
+
+                // Skip button
+                document.getElementById('skipBtn').addEventListener('click', () => {
+                    this.generateNewMolecule();
+                });
+
+                // Enter key to submit
+                document.getElementById('answer').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.checkAnswer();
+                    }
+                });
+            }
+
+            generateNewMolecule() {
+                const range = this.difficultyRanges[this.difficulty];
+                const numCarbons = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+                
+                this.currentMolecule = {
+                    numCarbons: numCarbons,
+                    name: this.alkaneNames[numCarbons]
+                };
+
+                this.drawMolecule(numCarbons);
+                document.getElementById('answer').value = '';
+                document.getElementById('feedback').style.display = 'none';
+                document.getElementById('answer').focus();
+            }
+
+            drawMolecule(numCarbons) {
+                const ctx = this.ctx;
+                const canvas = this.canvas;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Calculate spacing
+                const spacing = Math.min(80, (canvas.width - 100) / Math.max(numCarbons - 1, 1));
+                const startX = (canvas.width - (numCarbons - 1) * spacing) / 2;
+                const centerY = canvas.height / 2;
+
+                // Draw carbon chain
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+
+                // Draw bonds between carbons
+                for (let i = 0; i < numCarbons - 1; i++) {
+                    const x1 = startX + i * spacing;
+                    const x2 = startX + (i + 1) * spacing;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x1, centerY);
+                    ctx.lineTo(x2, centerY);
+                    ctx.stroke();
+                }
+
+                // Draw carbon vertices (corners of skeletal structure)
+                ctx.fillStyle = '#333';
+                for (let i = 0; i < numCarbons; i++) {
+                    const x = startX + i * spacing;
+                    
+                    // Draw circle at vertex
+                    ctx.beginPath();
+                    ctx.arc(x, centerY, 6, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    // For first and last carbon, draw terminal hydrogen lines
+                    if (i === 0 || i === numCarbons - 1) {
+                        // Draw three small lines representing CH3 terminal groups
+                        ctx.strokeStyle = '#666';
+                        ctx.lineWidth = 2;
+                        
+                        if (i === 0) {
+                            // Left terminal
+                            ctx.beginPath();
+                            ctx.moveTo(x - 20, centerY - 20);
+                            ctx.lineTo(x - 5, centerY - 5);
+                            ctx.stroke();
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(x - 20, centerY + 20);
+                            ctx.lineTo(x - 5, centerY + 5);
+                            ctx.stroke();
+                        } else {
+                            // Right terminal
+                            ctx.beginPath();
+                            ctx.moveTo(x + 20, centerY - 20);
+                            ctx.lineTo(x + 5, centerY - 5);
+                            ctx.stroke();
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(x + 20, centerY + 20);
+                            ctx.lineTo(x + 5, centerY + 5);
+                            ctx.stroke();
+                        }
+                        ctx.strokeStyle = '#333';
+                        ctx.lineWidth = 3;
+                    }
+                }
+
+                // Add title
+                ctx.fillStyle = '#667eea';
+                ctx.font = 'bold 18px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Carbon Chain Structure (${numCarbons} carbon${numCarbons > 1 ? 's' : ''})`, canvas.width / 2, 30);
+                
+                // Add hint about skeletal structure
+                ctx.fillStyle = '#666';
+                ctx.font = '14px Arial';
+                ctx.fillText('Each vertex represents a carbon atom with implicit hydrogens', canvas.width / 2, canvas.height - 20);
+            }
+
+            checkAnswer() {
+                const userAnswer = document.getElementById('answer').value.trim().toLowerCase();
+                const correctAnswer = this.currentMolecule.name;
+                const feedback = document.getElementById('feedback');
+
+                this.total++;
+                document.getElementById('total').textContent = this.total;
+
+                if (userAnswer === correctAnswer) {
+                    this.correct++;
+                    this.score += this.getPoints();
+                    
+                    document.getElementById('correct').textContent = this.correct;
+                    document.getElementById('score').textContent = this.score;
+
+                    feedback.className = 'feedback correct';
+                    feedback.innerHTML = `<strong>✓ Correct!</strong>The answer is <strong>${correctAnswer}</strong>. Great job!`;
+                    
+                    setTimeout(() => {
+                        this.generateNewMolecule();
+                    }, 2000);
+                } else {
+                    feedback.className = 'feedback incorrect';
+                    if (userAnswer === '') {
+                        feedback.innerHTML = `<strong>✗ No answer provided</strong>Please enter a name and try again.`;
+                    } else {
+                        feedback.innerHTML = `<strong>✗ Incorrect</strong>Your answer: <strong>${userAnswer}</strong><br>Correct answer: <strong>${correctAnswer}</strong>`;
+                        
+                        setTimeout(() => {
+                            this.generateNewMolecule();
+                        }, 3000);
+                    }
+                }
+            }
+
+            getPoints() {
+                const points = {
+                    easy: 10,
+                    medium: 20,
+                    hard: 30
+                };
+                return points[this.difficulty];
+            }
+        }
+
+        // Initialize the application
+        window.addEventListener('DOMContentLoaded', () => {
+            new OrganicChemistryTutor();
+        });
+    </script>
+</body>
+</html>
